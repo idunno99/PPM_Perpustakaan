@@ -1,20 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:get/get.dart';
+// import 'package:get/get.dart';
 // import 'package:perpus/menu_navigation.dart';
 import 'package:perpustakaan/src/constants/colors.dart';
+import 'package:perpustakaan/src/features/core/screens/history/history_screen.dart';
 import 'package:perpustakaan/src/features/core/screens/home/home_screen.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.put(NavigationController());
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
 
+class _DashboardScreenState extends State<DashboardScreen> {
+  int _currentIndex = 0;
+  List<Widget> body = [
+    const HomeScreen(),
+    const HistoryScreen(),
+    Container(
+      color: Colors.blue,
+    ),
+    Container(
+      color: Colors.red,
+    )
+  ];
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(20.0)),
+          ),
           automaticallyImplyLeading: false,
           elevation: 0,
           backgroundColor: tPrimaryColor,
@@ -36,72 +55,44 @@ class DashboardScreen extends StatelessWidget {
             ),
           ],
         ),
-        bottomNavigationBar: Obx(
-          () => NavigationBar(
-            labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-            elevation: 0,
-            height: 80,
-            selectedIndex: controller.selectedIndex.value,
-            onDestinationSelected: (index) =>
-                controller.selectedIndex.value = index,
-            indicatorColor: tAccentColor,
-            indicatorShape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(100)),
-            ),
-            overlayColor: const WidgetStatePropertyAll(tAccentColor),
-            backgroundColor: tPrimaryColor,
-            animationDuration: const Duration(milliseconds: 300),
-            destinations: const [
-              NavigationDestination(
-                icon: FaIcon(
-                  FontAwesomeIcons.house,
-                  color: tSecondaryColor,
-                ),
-                label: 'Home',
-              ),
-              NavigationDestination(
-                icon: FaIcon(
-                  FontAwesomeIcons.clockRotateLeft,
-                  color: tSecondaryColor,
-                ),
-                label: 'History',
-              ),
-              NavigationDestination(
-                icon: FaIcon(
-                  FontAwesomeIcons.solidBookmark,
-                  color: tSecondaryColor,
-                ),
-                label: 'Bookmark',
-              ),
-              NavigationDestination(
-                icon: FaIcon(
-                  FontAwesomeIcons.solidUser,
-                  color: tSecondaryColor,
-                ),
-                label: 'Profile',
-              ),
-            ],
+        bottomNavigationBar: BottomNavigationBar(
+          useLegacyColorScheme: false,
+          elevation: 0,
+          showUnselectedLabels: false,
+          unselectedItemColor: tAccentColor,
+          backgroundColor: tPrimaryColor,
+          fixedColor: tSecondaryColor,
+          type: BottomNavigationBarType.fixed,
+          currentIndex: _currentIndex,
+          onTap: (int newIndex) {
+            setState(() {
+              _currentIndex = newIndex;
+            });
+          },
+          selectedLabelStyle: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            fontFamily: 'Poppins',
           ),
+          items: const [
+            BottomNavigationBarItem(
+              icon: FaIcon(FontAwesomeIcons.house),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: FaIcon(FontAwesomeIcons.clockRotateLeft),
+              label: 'History',
+            ),
+            BottomNavigationBarItem(
+              icon: FaIcon(FontAwesomeIcons.solidBookmark),
+              label: 'Bookmark',
+            ),
+            BottomNavigationBarItem(
+              icon: FaIcon(FontAwesomeIcons.solidUser),
+              label: 'Profile',
+            ),
+          ],
         ),
-        body: Obx(
-          () => controller.screens[controller.selectedIndex.value],
-        ));
+        body: body[_currentIndex]);
   }
-}
-
-class NavigationController extends GetxController {
-  final Rx<int> selectedIndex = 0.obs;
-
-  final screens = [
-    HomeScreen(),
-    Container(
-      color: Colors.amber,
-    ),
-    Container(
-      color: Colors.blue,
-    ),
-    Container(
-      color: Colors.red,
-    )
-  ];
 }
