@@ -1,11 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-// import 'package:perpustakaan/firebase_options.dart';
 import 'package:perpustakaan/src/features/authentication/screens/login/welcome_screen.dart';
-// import 'package:perpustakaan/src/repository/authentication_repository/authentication_repository.dart';
+import 'package:perpustakaan/src/features/authentication/screens/signup/signup_screen.dart';
+import 'package:perpustakaan/src/features/core/screens/dashboard/dashboard_screen.dart';
 
-void main() async {
+Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(const App());
@@ -16,9 +15,14 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const GetMaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: WelcomeScreen(),
+      routes: {
+        '/login': (context) => const WelcomeScreen(),
+        '/signup': (context) => const SignupScreen(),
+        '/dashboard': (context) => const DashboardScreen(),
+      },
+      home: const WelcomeScreen(),
     );
   }
 }

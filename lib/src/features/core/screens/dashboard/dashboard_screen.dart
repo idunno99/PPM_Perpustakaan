@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:perpustakaan/src/constants/colors.dart';
 import 'package:perpustakaan/src/features/core/screens/history/history_screen.dart';
 import 'package:perpustakaan/src/features/core/screens/home/home_screen.dart';
+import 'package:perpustakaan/src/features/core/screens/profile/profile_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -21,9 +22,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     Container(
       color: Colors.blue,
     ),
-    Container(
-      color: Colors.red,
-    )
+    const ProfileScreen(),
   ];
 
   @override

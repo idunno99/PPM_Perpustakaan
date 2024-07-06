@@ -1,11 +1,31 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:perpustakaan/src/constants/colors.dart';
-import 'package:perpustakaan/src/features/core/screens/dashboard/dashboard_screen.dart';
+import 'package:perpustakaan/src/features/authentication/controllers/firebase_auth_services.dart';
+// import 'package:perpustakaan/src/features/core/screens/dashboard/dashboard_screen.dart';
 
-class LoginFormWidget extends StatelessWidget {
+class LoginFormWidget extends StatefulWidget {
   const LoginFormWidget({super.key});
+
+  @override
+  State<LoginFormWidget> createState() => _LoginFormWidgetState();
+}
+
+class _LoginFormWidgetState extends State<LoginFormWidget> {
+  final FirebaseAuthServices _auth = FirebaseAuthServices();
+
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +36,7 @@ class LoginFormWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             TextFormField(
+              controller: _emailController,
               decoration: const InputDecoration(
                 focusColor: Color(0xff597445),
                 focusedBorder: OutlineInputBorder(
@@ -29,7 +50,7 @@ class LoginFormWidget extends StatelessWidget {
                     color: tPrimaryColor,
                   ),
                 ),
-                hintText: "Username or Email",
+                hintText: "Email",
                 hintStyle: TextStyle(color: Colors.grey),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10.0)),
@@ -40,6 +61,7 @@ class LoginFormWidget extends StatelessWidget {
               height: 10,
             ),
             TextFormField(
+              controller: _passwordController,
               decoration: const InputDecoration(
                 focusColor: Color(0xff597445),
                 focusedBorder: OutlineInputBorder(
@@ -82,14 +104,7 @@ class LoginFormWidget extends StatelessWidget {
               child: SizedBox(
                 width: 150,
                 child: MaterialButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const DashboardScreen(),
-                      ),
-                    );
-                  },
+                  onPressed: _singIn,
                   height: 40,
                   color: const Color(0xffB59F6B),
                   shape: RoundedRectangleBorder(
@@ -113,5 +128,19 @@ class LoginFormWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _singIn() async {
+    String email = _emailController.text;
+    String password = _passwordController.text;
+
+    User? user = await _auth.signInWithEmailAndPassword(email, password);
+
+    if (user != null) {
+      print("User is Successfully created");
+      Navigator.pushNamed(context, '/dashboard');
+    } else {
+      print("User is not Successfully created");
+    }
   }
 }

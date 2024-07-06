@@ -1,18 +1,43 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:get/get.dart';
 import 'package:perpustakaan/src/constants/colors.dart';
-import 'package:perpustakaan/src/features/authentication/controllers/signup_controller.dart';
+import 'package:perpustakaan/src/features/authentication/controllers/firebase_auth_services.dart';
+// import 'package:get/get.dart';
+// import 'package:perpustakaan/src/features/authentication/controllers/signup_controller.dart';
 
-class SignupFormWidget extends StatelessWidget {
+class SignupFormWidget extends StatefulWidget {
   const SignupFormWidget({super.key});
-  
+
+  @override
+  State<SignupFormWidget> createState() => _SignupFormWidgetState();
+}
+
+class _SignupFormWidgetState extends State<SignupFormWidget> {
+  final FirebaseAuthServices _auth = FirebaseAuthServices();
+
+  var formKey = GlobalKey<FormState>();
+  var isLoading = false;
+
+  final TextEditingController _fullnameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+
+  @override
+  void dispose() {
+    _fullnameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(SignupController());
-    final formKey = GlobalKey<FormState>();
-
     return Form(
       key: formKey,
       child: Container(
@@ -21,7 +46,7 @@ class SignupFormWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             TextFormField(
-              controller: controller.fullname,
+              controller: _fullnameController,
               decoration: const InputDecoration(
                 focusColor: Color(0xff597445),
                 focusedBorder: OutlineInputBorder(
@@ -46,7 +71,7 @@ class SignupFormWidget extends StatelessWidget {
               height: 10,
             ),
             TextFormField(
-              controller: controller.email,
+              controller: _emailController,
               decoration: const InputDecoration(
                 focusColor: Color(0xff597445),
                 focusedBorder: OutlineInputBorder(
@@ -71,7 +96,7 @@ class SignupFormWidget extends StatelessWidget {
               height: 10,
             ),
             TextFormField(
-              controller: controller.password,
+              controller: _passwordController,
               decoration: const InputDecoration(
                 focusColor: Color(0xff597445),
                 focusedBorder: OutlineInputBorder(
@@ -101,12 +126,12 @@ class SignupFormWidget extends StatelessWidget {
             ),
             TextFormField(
               validator: (value) {
-                if (value != controller.password.text) {
+                if (value != _passwordController.text) {
                   return "Password doesn't match";
                 }
                 return null;
               },
-              controller: controller.confrimpassword,
+              controller: _confirmPasswordController,
               decoration: const InputDecoration(
                 focusColor: Color(0xff597445),
                 focusedBorder: OutlineInputBorder(
@@ -139,13 +164,7 @@ class SignupFormWidget extends StatelessWidget {
               child: SizedBox(
                 width: 150,
                 child: MaterialButton(
-                  onPressed: () {
-                    // Validate returns true if the form is valid, or false otherwise.
-                    
-                    if (formKey.currentState!.validate()) {
-                      SignupController.instance.registerUser(controller.email.text.trim(), controller.password.text.trim());
-                    }
-                  },
+                  onPressed: _singUp,
                   height: 35,
                   color: const Color(0xffB59F6B),
                   shape: RoundedRectangleBorder(
@@ -169,5 +188,22 @@ class SignupFormWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _singUp() async {
+    String email = _emailController.text;
+    String password = _passwordController.text;
+    String confirmPassword = _confirmPasswordController.text;
+
+    if (formKey.currentState?.validate() ?? false) {
+      User? user = await _auth.signUpWithEmailAndPassword(email, password);
+      if (user != null && password == confirmPassword) {
+        Navigator.pushNamed(context, '/dashboard');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Sign Up Failed')),
+        );
+      }
+    }
   }
 }
